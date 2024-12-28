@@ -2,7 +2,7 @@ function [tr, est] = xtrace(B,n,s)
 % Input:  Function B() computing matrix products B(X) = B*X, number
 %         of rows n, and number of matvecs s
 % Output: Estimate tr of trace(B), estimate est of the error
-%         abs(tr - trace(B)
+%         abs(tr - trace(B))
 
 % Define test matrix 
 k = floor(s/2);         % Approximation rank is s/2
