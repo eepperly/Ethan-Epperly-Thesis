@@ -20,7 +20,7 @@ W = Q'*Om;
 T = Z'*Om;
 X = W - diagprod(S,W) .* S;
 
-% Compute estimator, output
+% Compute estimator and estimate
 tr_vec = trace(H) * ones(k,1) - diagprod(H*S,S) - diagprod(X,T)...
             + diagprod(H*X,X) + diagprod(S, W) .* diagprod(R, S);
 tr = mean(tr_vec);           % Trace estimate
