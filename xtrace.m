@@ -18,9 +18,9 @@ Z = B(Q);  % Collect matvecs
 H = Q'*Z;
 W = Q'*Om;
 T = Z'*Om;
-X = W - diagprod(W,S) .* S;
+X = W - S .* diagprod(W,S).';
 
-% Compute estimator and estimate
+% Compute estimator, output
 tr_vec = trace(H) * ones(k,1) - diagprod(H*S,S) - diagprod(X,T)...
             + diagprod(H*X,X) + diagprod(S, W) .* diagprod(R, S);
 tr = mean(tr_vec);           % Trace estimate
