@@ -13,9 +13,9 @@ Y = Bt(G);              % Matvecs with B'
 S = cnormc(inv(R'));    % cnormc normalizes columns
 
 % Compute other necessary matrices
-Z = B(Q);                   % Matvecs with B
+Z = B(Q);               % Matvecs with B
 W = Q'*Om;
-X = W - S .* diagprod(W,S).';
+X = W - S .* diagprod(S,W).';
 
 % Form estimate
 srn = sqrownorms(Z) + (-sqrownorms(Z*S) + sqrownorms(G - Z*X))/k;

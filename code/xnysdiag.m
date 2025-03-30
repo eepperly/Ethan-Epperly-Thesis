@@ -6,7 +6,7 @@ function d = xnysdiag(A,n,s)
 [F,mu,Om,R] = nystrom(A,n,s);                  % Nystrom approx 
 Z = (F/R') .* (sqrownorms(inv(R)) .^ (-1/2))'; % Downdate it
 d = sqrownorms(F) + (-sqrownorms(Z) + sum((Z...% Compute estimator
-    .* conj(Om)) .* diagprod(Om,Z).',2))/s ...
+    .* conj(Om)) .* diagprod(Z,Om).',2))/s ...
     - mu * ones(n,1);
 
 end

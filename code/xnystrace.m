@@ -9,7 +9,7 @@ Z = (F/R') .* (sqrownorms(inv(R)) .^ (-1/2))'; % Downdate it
 
 % Compute vector of estimates
 tr_vec = norm(F,"fro")^2 * ones(s,1) - sqcolnorms(Z) ...
-    + abs(diagprod(Om,Z)) .^ 2 - mu * n * ones(s,1);
+    + abs(diagprod(Z,Om)) .^ 2 - mu * n * ones(s,1);
 tr = mean(tr_vec);           % Trace estimate
 est = std(tr_vec) / sqrt(s); % Error estimate
 
