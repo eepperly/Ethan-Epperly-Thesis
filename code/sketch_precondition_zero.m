@@ -5,7 +5,7 @@ function X = sketch_precondition_zero(B,c,S,iter)
     
     [~,D,V] = svd(S'*B,"econ");        % Sketch and compute SVD
     prec = V / D;                      % Form preconditioner
-    y0 = zeros(size(B,2));             % **Zero** initialization
+    y0 = zeros(size(B,2),1);           % **Zero** initialization
     Y = mylsqr(@(z) B*(prec*z), ...    % Preconditioned LSQR
                @(z) prec'*(B'*z), ... 
                c, y0, iter);
