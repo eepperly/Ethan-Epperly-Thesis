@@ -1,15 +1,15 @@
-function X = mylsqr(B,Bt,c,iter)
+function X = mylsqr(B,Bt,c,x0,iter)
 % Input:  Functions B() and Bt() computing matrix products B(z) = 
-%         B*z and Bt(z) = B'*z, right-hand side c, number of
-%         iterations iter
+%         B*z and Bt(z) = B'*z, right-hand side c, initialization x0,
+%         number of iterations iter
 % Output: Approximate least-squares solutions stacked columnwise as X
     
     % First step of Golub-Kahan bidiagonalization
-    beta = norm(c); u = c / beta;
+    r = c - B(x0); beta = norm(r); u = r / beta;
     v = Bt(u); alpha = norm(v); v = v / alpha;
     w = v; phibar = beta; rhobar = alpha;
 
-    X = zeros(size(v,1),iter+1);
+    X = zeros(size(v,1),iter+1); X(:,1) = x0; % Initialize history
     for i = 1:iter
         % Golub-Kahan bidiagonalization
         u = B(v) - alpha*u; beta = norm(u); u = u / beta;
