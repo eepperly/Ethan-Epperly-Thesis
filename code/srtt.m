@@ -12,9 +12,9 @@ classdef srtt
         
         function y = mtimes(St, x)
             for i = 1:size(St.signs,2)
-                y = dct(St.signs(:,i) .* x);     % Random trig trans
+                x = dct(St.signs(:,i) .* x);     % Random trig trans
             end
-            y = y(St.idx,:);                     % Subsample
+            y = x(St.idx,:);                     % Subsample
             y = sqrt(length(x)/length(y)) * y;   % Rescale
         end
     end
