@@ -3,7 +3,7 @@ m = 1e5;
 trials = 100;
 
 rhos = [0.5 n/ceil(n*log(n))];
-Xs = cell(length(zetas),1);
+Xs = cell(length(rhos),1);
 Q = [eye(n);zeros(m-n,n)];
 
 for j = 1:length(rhos)

@@ -3,7 +3,7 @@ rho = 0.5;
 d = n / rho;
 
 trials = 100;
-zetas = [1 2 4 8];
+zetas = [1 2 4 8 16];
 Xs = cell(length(zetas),1);
 
 for j = 1:length(zetas)
@@ -45,7 +45,7 @@ for j = 1:length(zetas)
     axis([0 2.5 0 1.5])
 
     % Add labels and title
-    if j == 4
+    if j == length(zetas)
         xlabel('$\sigma_i(\mbox{\boldmath $SQ$})$')
     end
     ylabel('Prob.\ density')
@@ -56,7 +56,7 @@ for j = 1:length(zetas)
     stairs(sort(1 - min(X)),(1:trials)/trials, "b", 'LineWidth', 3); hold on % Set blue solid line
     stairs(sort(max(X)) - 1,(1:trials)/trials, "r--", 'LineWidth', 3) % Set red dashed line
     xline(sqrt(rho), 'k:', 'LineWidth', 3) % Keeping yline black
-    if j == 4
+    if j == length(zetas)
         legend({"$\eta_-$","$\eta_+$"},"Location","SouthEast","FontSize",16)
         xlabel("Distortion $\eta$")
     end
