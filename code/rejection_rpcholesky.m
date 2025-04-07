@@ -1,4 +1,4 @@
-function [S,R] = rpcholesky_rejection(kernel,sample_diagonal,k,d)
+function [S,R] = rejection_rpcholesky(kernel,sample_diagonal,k,d)
 % Input:  Kernel function kernel(S,T) giving m*n pairwise evaluations
 %         of the kernel function on the rows of an m*d matrix S and
 %         n*d matrix T, function sample_diagonal() giving a sample
