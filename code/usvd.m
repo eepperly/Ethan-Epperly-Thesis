@@ -6,7 +6,7 @@ function [U,S,V] = usvd(B,Bt,n,k)
 %         economy-size SVD Bhat = U*S*V'
 
 % Define test matrix 
-Om = sqrt(n) * cnormc(randn(n,k)); % Matrix of random signs
+Om = random_signs(n,k); % Matrix of random signs
 Y = B(Om);              % Matvecs with B
 [Q,R] = qr(Y,"econ");   % Randomized SVD
 S = cnormc(inv(R'));    % Downdate randomized SVD
