@@ -1,11 +1,10 @@
 thesis_startup
 
 n = 1000;
-As = {rand_with_evals(linspace(1,3,n)),...
-      rand_with_evals((1:n).^(-2)),...
-      rand_with_evals((0.7.^(0:(n-1)))),...
-      rand_with_evals([ones(1,ceil(n/20)) 1e-3*ones(1,n-ceil(n/20))])};
-names = {'flat','poly','exp','step'}; 
+W = randn(n,2*n); W = W*W';
+D = diag((1:n).^(-2));
+As = {rand_with_evals((1:n).^(-2)),...
+      sqrt(D) * W * sqrt(D)};
 
 s_list = 20:20:300;
 num_trials = 100;
@@ -15,7 +14,7 @@ diagpp_errs = zeros(length(s_list), num_trials, 4);
 xdiag_errs = zeros(length(s_list), num_trials, 4);
 xnysdiag_errs = zeros(length(s_list), num_trials, 4);
 
-figure("Position", [100, 100, 1350, 900])
+figure("Position", [100, 100, 1350, 450])
 
 for A_idx = 1:length(As)
     A = As{A_idx};
@@ -36,7 +35,7 @@ for A_idx = 1:length(As)
         end
     end
 
-    subplot(2,2,A_idx)
+    subplot(1,2,A_idx)
     quantiles = quantile(bks_errs(:,:,A_idx),[0.1 0.5 0.9],2);
     plot_shaded(s_list,quantiles(:,2),quantiles(:,1),quantiles(:,3),yellow,"Marker","s","MarkerSize",10)
     quantiles = quantile(diagpp_errs(:,:,A_idx),[0.1 0.5 0.9],2);
@@ -50,22 +49,15 @@ for A_idx = 1:length(As)
     xlabel("Number of matvecs $s$")
     ylabel("Maximum relative error")
 
-    if A_idx == 3
-        legend({"","BKS","","UDiag++","","XDiag","","XNysDiag"},"Location","east")
+    axis([-Inf Inf 1e-3 1e2])
+
+    if A_idx == 2
+        legend({"","BKS","","UDiag++","","XDiag","","XNysDiag"},"Location","southwest")
     end
     drawnow
 end
 
-save("../data/fig_17_1.mat","xnysdiag_errs","xdiag_errs","bks_errs","diagpp_errs")
+save("../data/fig_17_2.mat","xnysdiag_errs","xdiag_errs","bks_errs","diagpp_errs")
 
-subplot(2,2,1)
-title("flat","FontName","Courier New","Interpreter","TeX")
-subplot(2,2,2)
-title("poly","FontName","Courier New","Interpreter","TeX")
-subplot(2,2,3)
-title("exp","FontName","Courier New","Interpreter","TeX")
-subplot(2,2,4)
-title("step","FontName","Courier New","Interpreter","TeX")
-
-exportgraphics(gcf,"../figs/fig_17_1.png")
-saveas(gcf,"../figs/fig_17_1.fig")
+exportgraphics(gcf,"../figs/fig_17_2.png")
+saveas(gcf,"../figs/fig_17_2.fig")
