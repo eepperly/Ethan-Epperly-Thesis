@@ -6,7 +6,7 @@ function [tr, est] = xtrace(B,n,s)
 
 % Define test matrix 
 k = floor(s/2);         % Approximation rank is s/2
-Om = random_signs(n,k); % Matrix of random signs
+Om = randn(n,k);        % Gaussian matrix
 
 % Randomized SVD and downdate
 Y = B(Om);              % Collect matvecs
@@ -20,9 +20,13 @@ W = Q'*Om;
 T = Z'*Om;
 X = W - S .* diagprod(W,S).';
 
+% Scaling factor
+alpha = (n - k + 1) ./ (sqcolnorms(Om) - sqcolnorms(X));
+
 % Compute estimator, output
-tr_vec = trace(H) * ones(k,1) - diagprod(S,H*S) - diagprod(T,X)...
-            + diagprod(X,H*X) + diagprod(W, S) .* diagprod(S, R);
+tr_vec = trace(H) * ones(k,1) - diagprod(S,H*S)...
+     + alpha .* (-diagprod(T,X) + diagprod(X,H*X)...
+                 + diagprod(W, S) .* diagprod(S, R));
 tr = mean(tr_vec);           % Trace estimate
 est = std(tr_vec) / sqrt(k); % Error estimate
 
