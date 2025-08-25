@@ -1,4 +1,4 @@
-function [tr, est] = xtrace(B,n,s)
+function [tr, est] = xtrace_resphere(B,n,s)
 % Input:  Function B() computing matrix products B(X) = B*X, number
 %         of rows n, and number of matvecs s
 % Output: Estimate tr of trace(B), estimate est of the error

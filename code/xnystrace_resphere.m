@@ -1,4 +1,4 @@
-function [tr,est] = xnystrace_reiso(A,n,s)
+function [tr,est] = xnystrace_resphere(A,n,s)
 % Input:  Function A() computing matrix products A(X) = A*X, number
 %         of rows n, and number of matvecs s
 % Output: Estimate tr of trace(A), estimate est of the error
@@ -15,7 +15,7 @@ F = Y/R;                        % Triangular substitution
 % Downdating
 Z = (F/R') .* (sqrownorms(inv(R)) .^ (-1/2))';
 
-% Reisotropization
+% Resphering
 T = chol(Om'*Om);
 Tinv = inv(T);
 X = T - Tinv' / diag(sqcolnorms(Tinv'));
