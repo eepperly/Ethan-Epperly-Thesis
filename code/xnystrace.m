@@ -4,7 +4,7 @@ function [tr,est] = xnystrace(A,n,s)
 % Output: Estimate tr of trace(A), estimate est of the error
 %         abs(tr - trace(A))
 
-[F,mu,Om,R] = nystrom(A,n,s);                  % Nystrom approx 
+[F,mu,Om,R] = nystrom(A,n,s); % Nystrom approx in outer product form 
 Z = (F/R') .* (sqrownorms(inv(R)) .^ (-1/2))'; % Downdate it
 
 % Compute vector of estimates
