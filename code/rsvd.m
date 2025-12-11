@@ -6,7 +6,7 @@ function [U,S,V] = rsvd(B,Bt,n,k)
 
 Om = randn(n,k);            % Gaussian random test matrix
 Y = B(Om);                  % Matvecs with B
-Q = orth(Y);                % Orthogonalize
+[Q,~] = qr(Y,"econ");       % Orthogonalize
 C = Bt(Q);                  % Matvecs with B'
 [UU,S,V] = svd(C',"econ");  % SVD of factor matrix
 U = Q*UU;                   % Get left singular vectors
