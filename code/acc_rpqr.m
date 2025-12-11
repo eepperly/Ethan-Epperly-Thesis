@@ -9,7 +9,8 @@ S = zeros(k,1);                     % Pivots
 i = 0;                              % Index to store current position
 while i < k
     % Random sample using squared column norms as sampling weights
-    Sp = datasample(1:n,b,"Weights",sqcolnorms(B(i+1:end,:)),"Replace",true);
+    Sp = datasample(1:n,b,"Weights",sqcolnorms(B(i+1:end,:)),...
+        "Replace",true);
     % Form Gram matrix of selected pivots
     Bp = B(i+1:end,Sp);           % Bottom part of B stores residual
     H = Bp'*Bp;                   % Gram matrix
