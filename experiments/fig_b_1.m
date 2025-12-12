@@ -7,7 +7,7 @@ X = zeros(n,trials);
 
 for trial = 1:trials
     trial
-    X(:,trial) = svd(random_signs(d,n)/sqrt(d));
+    X(:,trial) = svd(randn(d,n)/sqrt(d));
 end
 
 %% Plot
@@ -24,7 +24,7 @@ bin_edges = linspace(0, 2.5, 101);  % Define bin edges
 for i = 1:size(X, 2)
     % Plot histogram of the ith column with transparency, same color, no edge
     h = histogram(X(:,i), "Normalization", "pdf", "BinEdges", bin_edges);
-    h.FaceColor = darkpurple;  % Set same face color
+    h.FaceColor = purple;  % Set same face color
     h.EdgeColor = 'none';  % Remove black outlines
     h.FaceAlpha = 0.02;  % Set transparency to 0.1
 end
@@ -37,7 +37,7 @@ plot(xx,sqrt((smax^2-xx.^2).*(xx.^2-smin^2)) ./ (pi*rho*xx),"k--")
 axis([0 2.5 0 1.5])
 
 % Add labels and title
-xlabel('$\sigma_i(\mbox{\boldmath $S$}^*\mbox{\boldmath $Q$})$')
+xlabel('$\sigma_i(\mbox{\boldmath $S$}^*a\mbox{\boldmath $Q$})$')
 ylabel('Probability density')
 
 nexttile(3)
@@ -50,5 +50,5 @@ ylabel("Cumulative distribution")
 
 % axis([0 1 0 1]) % Set axes limits
 
-saveas(gcf,"../figs/fig_23_2.fig")
-exportgraphics(gcf,"../figs/fig_23_2.png")
+saveas(gcf,"../figs/fig_b_1.fig")
+exportgraphics(gcf,"../figs/fig_b_1.png")

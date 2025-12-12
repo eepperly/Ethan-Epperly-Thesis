@@ -8,55 +8,55 @@ As = {rand_with_evals(linspace(1,3,n)),...
 names = {'flat','poly','exp','step'}; 
 
 s_list = 20:20:300;
-num_trials = 1000;
+num_trials = 100;
 
-gh_errs = zeros(length(s_list), num_trials, 4);
-hutchpp_errs = zeros(length(s_list), num_trials, 4);
-xtrace_errs = zeros(length(s_list), num_trials, 4);
-xnystrace_errs = zeros(length(s_list), num_trials, 4);
+bks_errs = zeros(length(s_list), num_trials, 4);
+diagpp_errs = zeros(length(s_list), num_trials, 4);
+xdiag_errs = zeros(length(s_list), num_trials, 4);
+xnysdiag_errs = zeros(length(s_list), num_trials, 4);
 
 figure("Position", [100, 100, 1350, 900])
 
 for A_idx = 1:length(As)
     A = As{A_idx};
-    trA = trace(A);
+    dA = diag(A);
 
     for s_idx = 1:length(s_list)
         s = s_list(s_idx);
         [A_idx s]
         for trial = 1:num_trials
-            gh_errs(s_idx,trial,A_idx)...
-                = abs(girard_hutchinson(@(X) A*X,n,s)-trA) / abs(trA);
-            hutchpp_errs(s_idx,trial,A_idx)...
-                = abs(hutchpp(@(X) A*X,n,s)-trA) / abs(trA);
-            xtrace_errs(s_idx,trial,A_idx)...
-                = abs(xtrace(@(X) A*X,n,s)-trA) / abs(trA);
-            xnystrace_errs(s_idx,trial,A_idx)...
-                = abs(xnystrace(@(X) A*X,n,s)-trA) / abs(trA);
+            bks_errs(s_idx,trial,A_idx)...
+                = norm((bks(@(X) A*X,n,s)-dA)./dA,Inf);
+            diagpp_errs(s_idx,trial,A_idx)...
+                = norm((udiagpp(@(X) A*X,@(X) A*X,n,s)-dA)./dA,Inf);
+            xdiag_errs(s_idx,trial,A_idx)...
+                = norm((xdiag(@(X) A*X,@(X) A*X,n,s)-dA)./dA,Inf);
+            xnysdiag_errs(s_idx,trial,A_idx)...
+                = norm((xnysdiag(@(X) A*X,n,s)-dA)./dA,Inf);
         end
     end
 
     subplot(2,2,A_idx)
-    quantiles = quantile(gh_errs(:,:,A_idx),[0.1 0.5 0.9],2);
+    quantiles = quantile(bks_errs(:,:,A_idx),[0.1 0.5 0.9],2);
     plot_shaded(s_list,quantiles(:,2),quantiles(:,1),quantiles(:,3),yellow,"Marker","s","MarkerSize",10)
-    quantiles = quantile(hutchpp_errs(:,:,A_idx),[0.1 0.5 0.9],2);
+    quantiles = quantile(diagpp_errs(:,:,A_idx),[0.1 0.5 0.9],2);
     plot_shaded(s_list,quantiles(:,2),quantiles(:,1),quantiles(:,3),purple,"Marker","*","MarkerSize",10)
-    quantiles = quantile(xtrace_errs(:,:,A_idx),[0.1 0.5 0.9],2);
+    quantiles = quantile(xdiag_errs(:,:,A_idx),[0.1 0.5 0.9],2);
     plot_shaded(s_list,quantiles(:,2),quantiles(:,1),quantiles(:,3),blue,"Marker","x","MarkerSize",10)
-    quantiles = quantile(xnystrace_errs(:,:,A_idx),[0.1 0.5 0.9],2);
+    quantiles = quantile(xnysdiag_errs(:,:,A_idx),[0.1 0.5 0.9],2);
     plot_shaded(s_list,quantiles(:,2),quantiles(:,1),quantiles(:,3),orange,"Marker","o","MarkerSize",10)
     set(gca,"YScale","log")
 
     xlabel("Number of matvecs $s$")
-    ylabel("Relative error")
+    ylabel("Maximum relative error")
 
     if A_idx == 3
-        legend({"","Girard--Hutchinson","","Hutch++","","XTrace","","XNysTrace"},"Location","east")
+        legend({"","BKS","","UDiag++","","XDiag","","XNysDiag"},"Location","east")
     end
     drawnow
 end
 
-save("../data/fig_14_1.mat","xnystrace_errs","xtrace_errs","gh_errs","hutchpp_errs")
+save("../data/fig_16_1.mat","xnysdiag_errs","xdiag_errs","bks_errs","diagpp_errs")
 
 subplot(2,2,1)
 title("flat","FontName","Courier New","Interpreter","TeX")
@@ -67,5 +67,5 @@ title("exp","FontName","Courier New","Interpreter","TeX")
 subplot(2,2,4)
 title("step","FontName","Courier New","Interpreter","TeX")
 
-exportgraphics(gcf,"../figs/fig_14_1.png")
-saveas(gcf,"../figs/fig_14_1.fig")
+exportgraphics(gcf,"../figs/fig_16_1.png")
+saveas(gcf,"../figs/fig_16_1.fig")

@@ -70,5 +70,5 @@ for j = 1:length(rhos)
     axis([0 1.5 0 1]) % Set axes limits
 end
 
-saveas(gcf,"../figs/fig_23_3.fig")
-exportgraphics(gcf,"../figs/fig_23_3.png")
+saveas(gcf,"../figs/fig_b_3.fig")
+exportgraphics(gcf,"../figs/fig_b_3.png")

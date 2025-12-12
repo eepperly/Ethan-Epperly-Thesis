@@ -1,71 +1,52 @@
 thesis_startup
+n = 1000; s = 100;
+ss = 5:5:100;
+trials = 100;
 
-n = 1000;
-As = {rand_with_evals(linspace(1,3,n)),...
-      rand_with_evals((1:n).^(-2)),...
-      rand_with_evals((0.7.^(0:(n-1)))),...
-      rand_with_evals([ones(1,ceil(n/20)) 1e-3*ones(1,n-ceil(n/20))])};
-names = {'flat','poly','exp','step'}; 
+powers = linspace(0,3,7);
+base_color = [100, 143, 255]/255;
+dark_color = base_color * 0.5;
+light_color = base_color + (1 - base_color) * 0.5; 
+custom_colormap1 = [linspace(dark_color(1), light_color(1), length(powers))', ...
+                   linspace(dark_color(2), light_color(2), length(powers))', ...
+                   linspace(dark_color(3), light_color(3), length(powers))'];
 
-s_list = 20:20:300;
-num_trials = 1000;
+base_color = [220,38,127]/255;
+dark_color = base_color * 0.5;
+light_color = base_color + (1 - base_color) * 0.5; 
+custom_colormap2 = [linspace(dark_color(1), light_color(1), length(powers))', ...
+                   linspace(dark_color(2), light_color(2), length(powers))', ...
+                   linspace(dark_color(3), light_color(3), length(powers))'];
 
-gh_errs = zeros(length(s_list), num_trials, 4);
-hutchpp_errs = zeros(length(s_list), num_trials, 4);
-xtrace_errs = zeros(length(s_list), num_trials, 4);
-xnystrace_errs = zeros(length(s_list), num_trials, 4);
 
-figure("Position", [100, 100, 1350, 900])
-
-for A_idx = 1:length(As)
-    A = As{A_idx};
-    trA = trace(A);
-
-    for s_idx = 1:length(s_list)
-        s = s_list(s_idx);
-        [A_idx s]
-        for trial = 1:num_trials
-            gh_errs(s_idx,trial,A_idx)...
-                = abs(girard_hutchinson(@(X) A*X,n,s)-trA) / abs(trA);
-            hutchpp_errs(s_idx,trial,A_idx)...
-                = abs(hutchpp(@(X) A*X,n,s)-trA) / abs(trA);
-            xtrace_errs(s_idx,trial,A_idx)...
-                = abs(xtrace(@(X) A*X,n,s)-trA) / abs(trA);
-            xnystrace_errs(s_idx,trial,A_idx)...
-                = abs(xnystrace(@(X) A*X,n,s)-trA) / abs(trA);
+figure("Position", [100, 100, 900, 400]);
+for idx = 1:length(powers)
+    power = powers(idx)
+    A = rand_with_evals((1:n) .^ (-power));
+    hutchpp_errs = zeros(size(ss));
+    xtrace_errs = zeros(size(ss));
+    for i = 1:length(ss)
+        s = ss(i);
+        for trial = 1:trials
+            hutchpp_errs(i) = hutchpp_errs(i) + abs(trace(A) - hutchpp(@(X) A*X,n,s))^2/trace(A)^2/trials;
+            xtrace_errs(i) = xtrace_errs(i) + abs(trace(A) - xtrace(@(X) A*X,n,s))^2/trace(A)^2/trials;
         end
     end
-
-    subplot(2,2,A_idx)
-    quantiles = quantile(gh_errs(:,:,A_idx),[0.1 0.5 0.9],2);
-    plot_shaded(s_list,quantiles(:,2),quantiles(:,1),quantiles(:,3),yellow,"Marker","s","MarkerSize",10)
-    quantiles = quantile(hutchpp_errs(:,:,A_idx),[0.1 0.5 0.9],2);
-    plot_shaded(s_list,quantiles(:,2),quantiles(:,1),quantiles(:,3),purple,"Marker","*","MarkerSize",10)
-    quantiles = quantile(xtrace_errs(:,:,A_idx),[0.1 0.5 0.9],2);
-    plot_shaded(s_list,quantiles(:,2),quantiles(:,1),quantiles(:,3),blue,"Marker","x","MarkerSize",10)
-    quantiles = quantile(xnystrace_errs(:,:,A_idx),[0.1 0.5 0.9],2);
-    plot_shaded(s_list,quantiles(:,2),quantiles(:,1),quantiles(:,3),orange,"Marker","o","MarkerSize",10)
-    set(gca,"YScale","log")
-
-    xlabel("Number of matvecs $s$")
-    ylabel("Relative error")
-
-    if A_idx == 3
-        legend({"","Girard--Hutchinson","","Hutch++","","XTrace","","XNysTrace"},"Location","east")
-    end
-    drawnow
+    subplot(1,2,1)
+    loglog(ss,sqrt(hutchpp_errs),"Color",custom_colormap1(idx,:)); hold on
+    subplot(1,2,2)
+    loglog(ss,sqrt(xtrace_errs),"Color",custom_colormap2(idx,:)); hold on
 end
 
-save("../data/fig_15_1.mat","xnystrace_errs","xtrace_errs","gh_errs","hutchpp_errs")
+for i = 1:2
+    subplot(1,2,i)
+    axis([-Inf Inf 5e-6 1e0])
+    plot(ss, 1./ss, "k--")
+    xlabel("Number of matvecs $s$")
+    if i == 1
+        ylabel("Root-mean-square error")
+    end
+end
 
-subplot(2,2,1)
-title("flat","FontName","Courier New","Interpreter","TeX")
-subplot(2,2,2)
-title("poly","FontName","Courier New","Interpreter","TeX")
-subplot(2,2,3)
-title("exp","FontName","Courier New","Interpreter","TeX")
-subplot(2,2,4)
-title("step","FontName","Courier New","Interpreter","TeX")
-
-exportgraphics(gcf,"../figs/fig_15_1.png")
-saveas(gcf,"../figs/fig_15_1.fig")
+exportgraphics(gcf,'../figs/fig_15_1.png')
+saveas(gcf,'../figs/fig_15_1.fig')

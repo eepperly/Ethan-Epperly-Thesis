@@ -1,69 +1,62 @@
 thesis_startup
 
-m = 1e5;
-n = 1e3;
-xx = linspace(-1,1,m).';
-B = cos(acos(xx) * (0:(n-1)));
-Q = orth(B);
+n = 1000;
+As = {rand_with_evals(linspace(1,3,n)),...
+      rand_with_evals((1:n).^(-2)),...
+      rand_with_evals((0.7.^(0:(n-1)))),...
+      rand_with_evals([ones(1,ceil(n/20)) 1e-3*ones(1,n-ceil(n/20))])};
+names = {'flat','poly','exp','step'}; 
 
-srnQ = sqrownorms(Q);
+k_list = 10:10:150;
+num_trials = 1000;
 
-s_list = 4:4:60;
-num_trials = 100;
+leaveout_errs = zeros(length(k_list), num_trials, 4);
+gh_errs = zeros(length(k_list), num_trials, 4);
 
-jl_errs = zeros(length(s_list), num_trials);
-bks_errs = zeros(length(s_list), num_trials);
-xnysdiag_errs = zeros(length(s_list), num_trials);
+figure("Position", [100, 100, 1350, 900])
 
-for s_idx = 1:length(s_list)
-    s = s_list(s_idx)
-    for trial = 1:num_trials
-        jl_est = jl_rownorm(@(X) Q*X,n,s);
-        jl_errs(s_idx,trial) = max([jl_est./srnQ;srnQ./jl_est]);
-        bks_est = (bks(@(X) Q*(Q'*X),m,s/2)-srnQ)./srnQ;
-        bks_errs(s_idx,trial) = max([bks_est./srnQ;srnQ./bks_est]);
-        xnysdiag_est = xnysdiag(@(X) Q*(Q'*X),m,s/2);
-        xnysdiag_errs(s_idx,trial) = max([xnysdiag_est./srnQ;srnQ./xnysdiag_est]);
+for A_idx = 1:length(As)
+    A = As{A_idx};
+
+    for k_idx = 1:length(k_list)
+        k = k_list(k_idx);
+        [A_idx k]
+        for trial = 1:num_trials
+            [U,S,V,est] = rsvd_errest(@(X) A*X,@(X) A*X,n,k);
+            err = norm(A-U*S*V',"fro");
+            leaveout_errs(k_idx,trial) = max(est / err,err / est) - 1;
+            Om = random_signs(1000,10);
+            est = norm(A*Om - U*(S*(V'*Om)),"fro")/sqrt(10);
+            gh_errs(k_idx,trial) = max(est / err,err / est) - 1;
+        end
     end
+
+    subplot(2,2,A_idx)
+    quantiles = quantile(gh_errs,[0.1 0.5 0.9],2);
+    plot_shaded(k_list,quantiles(:,2),quantiles(:,1),quantiles(:,3),purple,"Marker","*","MarkerSize",10)
+    quantiles = quantile(leaveout_errs,[0.1 0.5 0.9],2);
+    plot_shaded(k_list,quantiles(:,2),quantiles(:,1),quantiles(:,3),orange,"Marker","o","MarkerSize",10)
+    set(gca,"YScale","log")
+
+    xlabel("Approximation rank $k$")
+    ylabel("Approximation factor")
+
+    if A_idx == 2
+        legend({"","Girard--Hutchinson","","Leave-one-out"},"Location","southwest")
+    end
+    drawnow
 end
 
-%% Plot
+save("../data/fig_18_1.mat","gh_errs","leaveout_errs")
 
-figure(1)
+subplot(2,2,1)
+title("flat","FontName","Courier New","Interpreter","TeX")
+subplot(2,2,2)
+title("poly","FontName","Courier New","Interpreter","TeX")
+subplot(2,2,3)
+title("exp","FontName","Courier New","Interpreter","TeX")
+subplot(2,2,4)
+title("step","FontName","Courier New","Interpreter","TeX")
 
-quantiles = quantile(xnysdiag_errs,[0.1 0.5 0.9],2);
-plot_shaded(s_list,quantiles(:,2),quantiles(:,1),quantiles(:,3),purple,"Marker","*","MarkerSize",10)
-quantiles = quantile(bks_errs,[0.1 0.5 0.9],2);
-plot_shaded(s_list,quantiles(:,2),quantiles(:,1),quantiles(:,3),yellow,"Marker","s","MarkerSize",10)
-quantiles = quantile(jl_errs,[0.1 0.5 0.9],2);
-plot_shaded(s_list,quantiles(:,2),quantiles(:,1),quantiles(:,3),orange,"Marker","o","MarkerSize",10)
-
-set(gca,"YScale","log")
-
-xlabel("Number of matvecs $s$")
-ylabel("Approximation factor")
-
-legend({"","XNysDiag","","BKS","","JL"},"Location","east")
-
-exportgraphics(gcf,"../figs/fig_18_1_a.png")
-saveas(gcf,"../figs/fig_18_1_a.fig")
-
-figure(2)
-
-alphaVal = 0.1;
-scatter(xx, xnysdiag_est, 100, hex2rgb(purple), '*', ...
-    'MarkerFaceAlpha', alphaVal, 'MarkerEdgeAlpha', alphaVal); hold on
-scatter(xx, bks_est, 100, hex2rgb(yellow), 's', ...
-    'MarkerFaceAlpha', alphaVal, 'MarkerEdgeAlpha', alphaVal);
-scatter(xx, jl_est, 100, hex2rgb(orange), 'o', ...
-    'MarkerFaceAlpha', alphaVal, 'MarkerEdgeAlpha', alphaVal);semilogy(xx,srnQ,"Color",black,"LineStyle","--","LineWidth",4);
-plot(xx, srnQ, "Color", black, "LineStyle", "--", "LineWidth", 4);
-
-set(gca,"YScale","log")
-
-ylabel("Leverage score")
-
-axis([-1 1 1e-4 1e1])
-
-exportgraphics(gcf,"../figs/fig_18_1_b.png")
-saveas(gcf,"../figs/fig_18_1_b.fig")
+exportgraphics(gcf,"../figs/fig_18_1.png")
+saveas(gcf,"../figs/fig_18_1.fig")

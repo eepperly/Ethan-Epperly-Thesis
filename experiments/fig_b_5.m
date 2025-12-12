@@ -10,7 +10,7 @@ for j = 1:length(zetas)
     X = zeros(n,trials);
     for trial = 1:trials
         [j trial]
-        X(:,trial) = svd(full(sparse_sign(d,n,zetas(j))));
+        X(:,trial) = svd(full(sparse_iid(d,n,zetas(j))));
     end
     Xs{j} = X;
 end
@@ -32,7 +32,7 @@ for j = 1:length(zetas)
     for i = 1:size(X, 2)
         % Plot histogram of the ith column with transparency, same color, no edge
         h = histogram(X(:,i), "Normalization", "pdf", "BinEdges", bin_edges);
-        h.FaceColor = orange;  % Set same face color
+        h.FaceColor = darkorange;  % Set same face color
         h.EdgeColor = 'none';  % Remove black outlines
         h.FaceAlpha = 0.02;  % Set transparency to 0.1
     end
@@ -45,8 +45,8 @@ for j = 1:length(zetas)
     axis([0 2.5 0 1.5])
 
     % Add labels and title
-    if j == length(zetas)
-        xlabel('$\sigma_i(\mbox{\boldmath $SQ$})$')
+    if j == 5
+        xlabel('$\sigma_i(\mbox{\boldmath $S$}^*\mbox{\boldmath $Q$})$') 
     end
     ylabel('Prob.\ density')
 
@@ -65,5 +65,5 @@ for j = 1:length(zetas)
     axis([0.5 1.5 0 1]) % Set axes limits
 end
 
-saveas(gcf,"../figs/fig_23_6.fig")
-exportgraphics(gcf,"../figs/fig_23_6.png")
+saveas(gcf,"../figs/fig_b_5.fig")
+exportgraphics(gcf,"../figs/fig_b_5.png")
