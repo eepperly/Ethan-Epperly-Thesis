@@ -9,6 +9,6 @@ d = ones(size(D,1),1);                   % Diagonal of kernel matrix
 b = ceil(k/2);                           % Block size for acc. RPC
 [~,S] = acc_rpcholesky(Acol,Asub,d,k,b); % Subset selection by RPC
 
-[g,beta] = krr(y,kernel,D(S,:),lamb);    % Apply KRR
+[g,beta] = krr(y(S),kernel,D(S,:),lamb); % Apply KRR
 
 end
